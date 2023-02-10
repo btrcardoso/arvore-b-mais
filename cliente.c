@@ -1,5 +1,4 @@
 #include "cliente.h"
-#include <string.h>
 
 // Imprime dados do cliente
 void imprime_cliente(Cliente *cli){
