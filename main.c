@@ -5,6 +5,7 @@
 #include "cliente.c"
 #include "metadados.c"
 #include "no.c"
+#include "no_dados.c"
 
 FILE * abrir_arquivo_escrita(char *nome, FILE *f){
 
@@ -102,11 +103,23 @@ void teste_arquivo_de_indice(){
     free(f);
 }
 
+void teste_arquivo_de_dados(){
+    NoDados *n = no_dados();
+    n->s[0] = cliente(0, "ana");
+    n->s[1] = cliente(1, "bia");
+    n->s[2] = cliente(2, "carlos");
+    n->s[3] = cliente(3, "daniel");
+
+    imprime_no_dados(n);
+    libera_no_dados(n);
+}
+
 int main(void){
 
-    iniciar_metadados();
-    iniciar_indice();
-    teste_arquivo_de_indice();
+    // iniciar_metadados();
+    // iniciar_indice();
+    // teste_arquivo_de_indice();
+    teste_arquivo_de_dados();
     
     return 0;
 }
