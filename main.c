@@ -119,25 +119,33 @@ void teste_arquivo_de_dados(){
     // escrevendo no arquivo de dados
     printf("\n-----------------------Salvando informações no arquivo-----------------------\n");
     f = abrir_arquivo_escrita("dados.dat", f);
-    NoDados *n = no_dados();
-    n->s[0] = cliente(0, "ana");
-    n->m += 1;
-    n->s[1] = cliente(1, "bia");
-    n->m += 1;
-    n->s[2] = cliente(2, "carlos");
-    n->m += 1;
-    n->s[3] = cliente(3, "daniel");
-    n->m += 1;
-    salva_no_dados(n, f);
-    libera_no_dados(n);
+    NoDados *n;
+    for(int i=0; i<4; i++){
+        n = no_dados();
+        n->s[0] = cliente(0*i, "ana");
+        n->m += 1;
+        n->s[1] = cliente(1*i, "bia");
+        n->m += 1;
+        n->s[2] = cliente(2*i, "carlos");
+        n->m += 1;
+        n->s[3] = cliente(3*i, "daniel");
+        n->m += 1;
+        salva_no_dados(n, f);
+        libera_no_dados(n);
+    }
     fclose(f);
 
     // lendo no arquivo de dados
     printf("\n-----------------------Lendo informações no arquivo-----------------------\n");
     f = abrir_arquivo_leitura("dados.dat", f);
-    NoDados *n1 = le_no_dados(f);
-    imprime_no_dados(n1);
-    libera_no_dados(n1);
+    NoDados *n1;
+    for(int i=0; i<4; i++){
+        n1 = le_no_dados(f);
+        imprime_no_dados(n1);
+        libera_no_dados(n1);
+    }
+    
+    // fechando arquivo
     fclose(f);
 
     // liberando espaço de memória
