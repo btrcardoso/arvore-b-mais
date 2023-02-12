@@ -59,6 +59,16 @@ void iniciar_indice(){
     free(f);
 }
 
+void iniciar_dados(){
+    FILE *f;
+
+    // gravar informações em dados.dat
+    f = abrir_arquivo_escrita("dados.dat", f);
+    fclose(f);
+
+    free(f);
+}
+
 /* FUNÇÕES DE TESTE */
 
 void teste_arquivo_de_indice(){
@@ -104,14 +114,34 @@ void teste_arquivo_de_indice(){
 }
 
 void teste_arquivo_de_dados(){
+    FILE *f;
+
+    // escrevendo no arquivo de dados
+    printf("\n-----------------------Salvando informações no arquivo-----------------------\n");
+    f = abrir_arquivo_escrita("dados.dat", f);
     NoDados *n = no_dados();
     n->s[0] = cliente(0, "ana");
+    n->m += 1;
     n->s[1] = cliente(1, "bia");
+    n->m += 1;
     n->s[2] = cliente(2, "carlos");
+    n->m += 1;
     n->s[3] = cliente(3, "daniel");
-
-    imprime_no_dados(n);
+    n->m += 1;
+    salva_no_dados(n, f);
     libera_no_dados(n);
+    fclose(f);
+
+    // lendo no arquivo de dados
+    printf("\n-----------------------Lendo informações no arquivo-----------------------\n");
+    f = abrir_arquivo_leitura("dados.dat", f);
+    NoDados *n1 = le_no_dados(f);
+    imprime_no_dados(n1);
+    libera_no_dados(n1);
+    fclose(f);
+
+    // liberando espaço de memória
+    free(f);
 }
 
 int main(void){
