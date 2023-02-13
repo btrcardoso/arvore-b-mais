@@ -94,7 +94,11 @@ NoDados *le_no_dados(FILE *in){
 
 // Busca o nó da posição no arquivo
 NoDados * buscar_no_dados(int pos, FILE *in){
-    
+    // Calcula a posição correta do ponteiro
+    fseek(in, tamanho_no_dados() * pos, SEEK_SET);
+
+    // retorna o nó que está na posição encontrada
+    return le_no_dados(in);
 }
 
 // Retorna tamanho do no em bytes

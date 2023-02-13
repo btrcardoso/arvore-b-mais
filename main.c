@@ -128,8 +128,8 @@ void teste_arquivo_de_dados(){
         n->m += 1;
         n->s[2] = cliente(2*i, "carlos");
         n->m += 1;
-        n->s[3] = cliente(3*i, "daniel");
-        n->m += 1;
+        // n->s[3] = cliente(3*i, "daniel");
+        // n->m += 1;
         salva_no_dados(n, f);
         libera_no_dados(n);
     }
