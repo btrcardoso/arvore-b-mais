@@ -7,8 +7,10 @@
 #include "no.c"
 #include "no_dados.c"
 
-FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
 
+/****************************************** FUNÇÕES PARA ABERTURA DE ARQUIVOS ******************************************/
+
+FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
     // abre arquivo binário para escrita. Se o arquivo já existir o conteúdo é apagado.
     if((f = fopen(nome, "wb")) == NULL){
         printf("Erro ao abrir o arquivo");
@@ -16,11 +18,9 @@ FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
     } else {
         return f;
     }
-
 }
 
 FILE * abrir_arquivo_leitura(char *nome, FILE *f){
-
     // abre arquivo binário para leitura
     if((f = fopen(nome, "rb")) == NULL){
         printf("Erro ao abrir o arquivo");
@@ -28,11 +28,9 @@ FILE * abrir_arquivo_leitura(char *nome, FILE *f){
     } else {
         return f;
     }
-
 }
 
 FILE * abrir_arquivo_leitura_escrita(char *nome, FILE *f){
-
     // abre arquivo binário para leitura/escrita
     if((f = fopen(nome, "r+b")) == NULL){
         printf("Erro ao abrir o arquivo");
@@ -40,11 +38,9 @@ FILE * abrir_arquivo_leitura_escrita(char *nome, FILE *f){
     } else {
         return f;
     }
-
 }
 
 FILE * abrir_arquivo_leitura_escrita_novo(char *nome, FILE *f){
-
     // abre arquivo binário para leitura/escrita. Se o arquivo já existir o conteúdo é apagado.
     if((f = fopen(nome, "w+b")) == NULL){
         printf("Erro ao abrir o arquivo");
@@ -52,48 +48,32 @@ FILE * abrir_arquivo_leitura_escrita_novo(char *nome, FILE *f){
     } else {
         return f;
     }
-
 }
 
-void iniciar_metadados(){
-    FILE * f;
-    
-    // gravar informações em metadados.dat
-    f = abrir_arquivo_escrita_novo("metadados.dat", f);
+
+/************************************ FUNÇÕES PARA CRIAÇÃO DOS ARQUIVOS DA ÁRVORE B+ ************************************/
+
+void criar_arquivo_de_metadados(){
+    FILE * f = abrir_arquivo_escrita_novo("metadados.dat", f);
     iniciar_arquivo_metadados(f);
     fclose(f);
-
-    // ler as informações de metadados.dat
-    // f = abrir_arquivo_leitura("metadados.dat", f);
-    // Metadados * md = le_metadados(f);
-    // imprime_metadados(md);
-    // free(md);
-    // fclose(f);
-
     free(f);
 }
 
-void iniciar_indice(){
-    FILE *f;
-
-    // gravar informações em indice.dat
-    f = abrir_arquivo_escrita_novo("indice.dat", f);
+void criar_arquivo_de_indice(){
+    FILE *f = abrir_arquivo_escrita_novo("indice.dat", f);
     fclose(f);
-
     free(f);
 }
 
-void iniciar_dados(){
-    FILE *f;
-
-    // gravar informações em dados.dat
-    f = abrir_arquivo_escrita_novo("dados.dat", f);
+void criar_arquivo_de_dados(){
+    FILE *f = abrir_arquivo_escrita_novo("dados.dat", f);
     fclose(f);
-
     free(f);
 }
 
-/* FUNÇÕES DE TESTE */
+
+/***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE ÍNDICE *****************************************/
 
 void inserir_no_arquivo_de_indice(FILE *out){
     printf("\n-----------------------Inserindo informações no arquivo-----------------------\n");
@@ -118,8 +98,8 @@ void ler_arquivo_de_indice(FILE *in){
 
 }
 
-void teste_arquivo_de_indice(){
-    FILE *findice = abrir_arquivo_leitura_escrita_novo("indice.dat", findice);
+void testar_arquivo_de_indice(){
+    FILE *findice = abrir_arquivo_leitura_escrita("indice.dat", findice);
 
     inserir_no_arquivo_de_indice(findice);
     ler_arquivo_de_indice(findice);
@@ -127,6 +107,9 @@ void teste_arquivo_de_indice(){
     fclose(findice);
     free(findice);
 }
+
+
+/***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE DADOS *****************************************/
 
 void inserir_no_arquivo_de_dados(FILE *out){
     printf("\n-----------------------Inserindo informações no arquivo de dados-----------------------\n");
@@ -168,8 +151,8 @@ void ler_arquivo_de_dados(FILE *in){
 
 }
 
-void teste_arquivo_de_dados(){
-    FILE *fdados = abrir_arquivo_leitura_escrita_novo("dados.dat", fdados);
+void testar_arquivo_de_dados(){
+    FILE *fdados = abrir_arquivo_leitura_escrita("dados.dat", fdados);
 
     inserir_no_arquivo_de_dados(fdados);
     atualizar_arquivo_de_dados(fdados);
@@ -179,12 +162,18 @@ void teste_arquivo_de_dados(){
     free(fdados);
 }
 
+
+/******************************************************** MAIN ********************************************************/
+
 int main(void){
 
-    // iniciar_metadados();
-    // iniciar_indice();
-    teste_arquivo_de_indice();
-    // teste_arquivo_de_dados();
+    // criar_arquivo_de_metadados();
+    
+    // criar_arquivo_de_indice();
+    // testar_arquivo_de_indice();
+
+    // criar_arquivo_de_dados();
+    // testar_arquivo_de_dados();
     
     return 0;
 }
