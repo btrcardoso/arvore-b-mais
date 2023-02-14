@@ -2,6 +2,10 @@
 
 // Imprime dados do cliente
 void imprime_cliente(Cliente *cli){
+    if(cli == NULL){ 
+        printf("Cliente nulo\n");
+        return;
+    }
     printf("Codigo: %d\n", cli->codCliente);
     printf("Nome: %s\n", cli->nome);
 }

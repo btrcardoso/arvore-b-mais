@@ -5,8 +5,9 @@
 #include "cliente.c"
 #include "metadados.c"
 #include "no.c"
+#include "no_dados.c"
 
-FILE * abrir_arquivo_escrita(char *nome, FILE *f){
+FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
 
     // abre arquivo binário para escrita. Se o arquivo já existir o conteúdo é apagado.
     if((f = fopen(nome, "wb")) == NULL){
@@ -30,11 +31,35 @@ FILE * abrir_arquivo_leitura(char *nome, FILE *f){
 
 }
 
+FILE * abrir_arquivo_leitura_escrita(char *nome, FILE *f){
+
+    // abre arquivo binário para leitura/escrita
+    if((f = fopen(nome, "r+b")) == NULL){
+        printf("Erro ao abrir o arquivo");
+        exit(1);
+    } else {
+        return f;
+    }
+
+}
+
+FILE * abrir_arquivo_leitura_escrita_novo(char *nome, FILE *f){
+
+    // abre arquivo binário para leitura/escrita. Se o arquivo já existir o conteúdo é apagado.
+    if((f = fopen(nome, "w+b")) == NULL){
+        printf("Erro ao abrir o arquivo");
+        exit(1);
+    } else {
+        return f;
+    }
+
+}
+
 void iniciar_metadados(){
     FILE * f;
     
     // gravar informações em metadados.dat
-    f = abrir_arquivo_escrita("metadados.dat", f);
+    f = abrir_arquivo_escrita_novo("metadados.dat", f);
     iniciar_arquivo_metadados(f);
     fclose(f);
 
@@ -52,7 +77,17 @@ void iniciar_indice(){
     FILE *f;
 
     // gravar informações em indice.dat
-    f = abrir_arquivo_escrita("indice.dat", f);
+    f = abrir_arquivo_escrita_novo("indice.dat", f);
+    fclose(f);
+
+    free(f);
+}
+
+void iniciar_dados(){
+    FILE *f;
+
+    // gravar informações em dados.dat
+    f = abrir_arquivo_escrita_novo("dados.dat", f);
     fclose(f);
 
     free(f);
@@ -66,7 +101,7 @@ void teste_arquivo_de_indice(){
 
     // escrevendo no arquivo de indice
     printf("\n-----------------------Salvando informações no arquivo-----------------------\n");
-    f = abrir_arquivo_escrita("indice.dat", f);
+    f = abrir_arquivo_escrita_novo("indice.dat", f);
     No *pag;
     for(int i=0; i<10; i++){
         pag = no();
@@ -102,11 +137,60 @@ void teste_arquivo_de_indice(){
     free(f);
 }
 
+void atualizar_arquivo_de_dados(FILE *in){
+    printf("\n-----------------------Atualizando arquivo de dados-----------------------\n");
+    
+    rewind(in);
+    fseek(in, tamanho_no_dados() * 0, SEEK_SET);
+    NoDados *nd = no_dados();
+    salva_no_dados(nd, in);
+    libera_no_dados(nd);
+}
+
+void ler_arquivo_de_dados(FILE *in){
+    printf("\n-----------------------Lendo arquivo de dados-----------------------\n");
+    
+    rewind(in);
+    NoDados *nd;
+    while((nd = le_no_dados(in)) != NULL){
+        printf("\n");
+        imprime_no_dados(nd);
+        libera_no_dados(nd);
+    }
+
+}
+
+void inserir_no_arquivo_de_dados(FILE *out){
+    printf("\n-----------------------Salvando informações no arquivo de dados-----------------------\n");
+    
+    NoDados *n;
+    for(int i=0; i<4; i++){
+        n = no_dados();
+        n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
+        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
+        n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
+        n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
+        
+        salva_no_dados(n, out);
+        libera_no_dados(n);
+    } 
+}
+
+void teste_arquivo_de_dados(){
+    FILE *dados = abrir_arquivo_leitura_escrita_novo("dados.dat", dados);
+    inserir_no_arquivo_de_dados(dados);
+    atualizar_arquivo_de_dados(dados);
+    ler_arquivo_de_dados(dados);
+    fclose(dados);
+    free(dados);
+}
+
 int main(void){
 
-    iniciar_metadados();
-    iniciar_indice();
-    teste_arquivo_de_indice();
+    // iniciar_metadados();
+    // iniciar_indice();
+    // teste_arquivo_de_indice();
+    teste_arquivo_de_dados();
     
     return 0;
 }
