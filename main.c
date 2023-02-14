@@ -95,53 +95,61 @@ void iniciar_dados(){
 
 /* FUNÇÕES DE TESTE */
 
-void teste_arquivo_de_indice(){
-    // Inicia variável do ponteiro para arquivo
-    FILE *f;
-
-    // escrevendo no arquivo de indice
-    printf("\n-----------------------Salvando informações no arquivo-----------------------\n");
-    f = abrir_arquivo_escrita_novo("indice.dat", f);
+void inserir_no_arquivo_de_indice(FILE *out){
+    printf("\n-----------------------Inserindo informações no arquivo-----------------------\n");
     No *pag;
     for(int i=0; i<10; i++){
         pag = no();
-        pag->m = i;
-        salva_no(pag, f);
+        salva_no(pag, out);
         free(pag);
     }
-    fclose(f);
+}
+
+void ler_arquivo_de_indice(FILE *in){
+    printf("\n-----------------------Lendo arquivo de indice-----------------------\n");
     
-    // lendo no arquivo de indice
-    printf("\n-----------------------Lendo informações no arquivo-----------------------\n");
-    f = abrir_arquivo_leitura("indice.dat", f);
-    No *pag_test;
-    for(int i=0; i<10; i++){
-        printf("\n- %d -\n", i);
-        pag_test = le_no(f);
-        imprime_no(pag_test);
-        free(pag_test);
+    rewind(in);
+    No *n;
+    while((n = le_no(in)) != NULL){
+        imprime_no(n);
+        free(n);
         printf("\n");
     }
-    fclose(f);
 
-    // Buscar nó pela posição
-    printf("\n-----------------------Buscando nó pela posição-----------------------\n");
-    f = abrir_arquivo_leitura("indice.dat", f);
-    No *pagpos;
-    pagpos = buscar_no(3, f);
-    imprime_no(pagpos);
-    free(pagpos);
-    fclose(f);
+}
 
-    // Libera variável do ponteiro para arquivo
-    free(f);
+void teste_arquivo_de_indice(){
+    FILE *findice = abrir_arquivo_leitura_escrita_novo("indice.dat", findice);
+
+    inserir_no_arquivo_de_indice(findice);
+    ler_arquivo_de_indice(findice);
+
+    fclose(findice);
+    free(findice);
+}
+
+void inserir_no_arquivo_de_dados(FILE *out){
+    printf("\n-----------------------Inserindo informações no arquivo de dados-----------------------\n");
+    
+    NoDados *n;
+    for(int i=0; i<4; i++){
+        n = no_dados();
+        n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
+        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
+        n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
+        n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
+        
+        salva_no_dados(n, out);
+        libera_no_dados(n);
+    } 
 }
 
 void atualizar_arquivo_de_dados(FILE *in){
     printf("\n-----------------------Atualizando arquivo de dados-----------------------\n");
     
     rewind(in);
-    fseek(in, tamanho_no_dados() * 0, SEEK_SET);
+    int pos = 0;
+    fseek(in, tamanho_no_dados() * pos, SEEK_SET);
     NoDados *nd = no_dados();
     salva_no_dados(nd, in);
     libera_no_dados(nd);
@@ -160,37 +168,23 @@ void ler_arquivo_de_dados(FILE *in){
 
 }
 
-void inserir_no_arquivo_de_dados(FILE *out){
-    printf("\n-----------------------Salvando informações no arquivo de dados-----------------------\n");
-    
-    NoDados *n;
-    for(int i=0; i<4; i++){
-        n = no_dados();
-        n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
-        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
-        n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
-        n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
-        
-        salva_no_dados(n, out);
-        libera_no_dados(n);
-    } 
-}
-
 void teste_arquivo_de_dados(){
-    FILE *dados = abrir_arquivo_leitura_escrita_novo("dados.dat", dados);
-    inserir_no_arquivo_de_dados(dados);
-    atualizar_arquivo_de_dados(dados);
-    ler_arquivo_de_dados(dados);
-    fclose(dados);
-    free(dados);
+    FILE *fdados = abrir_arquivo_leitura_escrita_novo("dados.dat", fdados);
+
+    inserir_no_arquivo_de_dados(fdados);
+    atualizar_arquivo_de_dados(fdados);
+    ler_arquivo_de_dados(fdados);
+
+    fclose(fdados);
+    free(fdados);
 }
 
 int main(void){
 
     // iniciar_metadados();
     // iniciar_indice();
-    // teste_arquivo_de_indice();
-    teste_arquivo_de_dados();
+    teste_arquivo_de_indice();
+    // teste_arquivo_de_dados();
     
     return 0;
 }
