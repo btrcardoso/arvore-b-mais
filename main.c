@@ -166,14 +166,11 @@ void inserir_no_arquivo_de_dados(FILE *out){
     NoDados *n;
     for(int i=0; i<4; i++){
         n = no_dados();
-        n->s[0] = cliente(0*i, "ana");
-        n->m += 1;
-        n->s[1] = cliente(1*i, "bia");
-        n->m += 1;
-        n->s[2] = cliente(2*i, "carlos");
-        n->m += 1;
-        n->s[3] = cliente(3*i, "daniel");
-        n->m += 1;
+        n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
+        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
+        n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
+        n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
+        
         salva_no_dados(n, out);
         libera_no_dados(n);
     } 

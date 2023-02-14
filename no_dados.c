@@ -120,3 +120,21 @@ void libera_no_dados(NoDados* no_dados){
     // liberando espaço de memória do nó
     free(no_dados);
 }
+
+// Insere cliente no nó_dado
+NoDados * inserir_cliente_em_no_dado(NoDados* no_dados, Cliente *cli){
+    int qtd = no_dados->m;
+
+    if(qtd >= 4){
+        printf("Não é possível inserir o cliente no nó, pois o nó está cheio.\n");
+    
+        // reorganização de acordo com o algoritmo da árvore b+
+    } else {
+        no_dados->s[qtd] = cli;
+        no_dados->m += 1;
+
+       // no_dados->s = vetor de clientes ordenados 
+    }
+
+    return no_dados;
+}

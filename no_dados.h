@@ -26,3 +26,6 @@ int tamanho_no_dados();
 
 // Libera o espaço de memória de no_dados
 void libera_no_dados(NoDados* no_dados);
+
+// Insere cliente no nó_dado
+NoDados * inserir_cliente_em_no_dado(NoDados* no_dados, Cliente *cli);
