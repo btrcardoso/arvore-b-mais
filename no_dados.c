@@ -55,7 +55,8 @@ void salva_no_dados(NoDados *no_dados, FILE *out){
     for(int i=0; i<4; i++){
 
         if(no_dados->s[i] == NULL){
-            printf("nulo\n");
+            printf("Nó de dados nulo. Não foi possível salvar. Abortar.\n");
+            exit(1);
         } else {
            salva_cliente(no_dados->s[i], out);
         }
