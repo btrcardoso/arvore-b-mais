@@ -1,7 +1,7 @@
 #include "metadados.h"
 
 void iniciar_arquivo_metadados(FILE *out){
-    int pont_raiz = 0;
+    int pont_raiz = -1;
     int flag_raiz_folha = 0;
     
     fwrite(&pont_raiz, sizeof(int), 1, out);
@@ -9,6 +9,7 @@ void iniciar_arquivo_metadados(FILE *out){
 }
 
 Metadados * le_metadados(FILE *in){
+    rewind(in);
     Metadados *md = (Metadados *) malloc(sizeof(Metadados));
     fread(&md->pont_raiz, sizeof(int), 1, in);
     fread(&md->flag_raiz_folha, sizeof(int), 1, in);
@@ -19,4 +20,12 @@ Metadados * le_metadados(FILE *in){
 void imprime_metadados(Metadados *md){
     printf("Ponteiro da raiz: %d\n", md->pont_raiz);
     printf("A raiz eh folha? %d\n", md->flag_raiz_folha);
+}
+
+void salva_metadados(Metadados *md, FILE *out){
+
+    rewind(out);
+    fwrite(&md->pont_raiz, sizeof(int), 1, out);
+    fwrite(&md->flag_raiz_folha, sizeof(int), 1, out);
+
 }

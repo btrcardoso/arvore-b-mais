@@ -55,7 +55,7 @@ void salva_no_dados(NoDados *no_dados, FILE *out){
     for(int i=0; i<4; i++){
 
         if(no_dados->s[i] == NULL){
-            printf("Nó de dados nulo. Não foi possível salvar. Abortar.\n");
+            printf("Cliente nulo em nó de dados. Não foi possível salvar. Abortar.\n");
             exit(1);
         } else {
            salva_cliente(no_dados->s[i], out);
@@ -128,7 +128,8 @@ NoDados * inserir_cliente_em_no_dado(NoDados* no_dados, Cliente *cli){
     if(qtd >= 4){
         printf("Não é possível inserir o cliente no nó, pois o nó está cheio.\n");
     
-        // reorganização de acordo com o algoritmo da árvore b+
+        // reorganização de acordo com o algoritmo da árvore b+, por enquanto, deixamos aí o exit(1)
+        exit(1);
     } else {
         no_dados->s[qtd] = cli;
         no_dados->m += 1;

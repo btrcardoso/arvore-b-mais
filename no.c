@@ -108,3 +108,8 @@ int tamanho_no(){
         + sizeof(int) * 4  // s[]
         + sizeof(int) * 5; // p[]
 }
+
+// libera o nó
+void libera_no(No *no){
+    // implementar
+}

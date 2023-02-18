@@ -27,3 +27,6 @@ No * buscar_no(int pos, FILE *in);
 // Retorna tamanho do no em bytes
 int tamanho_no();
 
+// libera o nó
+void libera_no(No *no);
+
