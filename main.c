@@ -8,6 +8,21 @@
 #include "no_dados.c"
 
 
+typedef struct Info{
+    int p_f_indice;       // posição no arquivo de índice. se -1, então a raíz é folha. Se for maior que -1 então é uma posição do arquivo mesmo
+    int p_f_dados;        // posicao no arquivo de dados 
+    int pos_vetor_dados;// posicao no vetor de dados ou posição que deveria estar no vetor de dados. se for = 4 é pq o vetor de dados esta cheio e deve ser particionado.
+    int encontrou;         // verifica se já existe cliente com o codigo buscado no arquivo de dados
+} Info;
+
+
+void imprime_info(Info *info){
+    printf("Posição do nó no arquivo de índice: %d\n", info->p_f_indice);
+    printf("Posicao do nó no arquivo de dados: %d\n", info->p_f_dados);
+    printf("Posicao que o cliente está ou deveria no vetor S do nó de dados: %d\n", info->pos_vetor_dados);
+    printf("Encontramos? %d\n", info->encontrou);
+}
+
 /****************************************** FUNÇÕES PARA ABERTURA DE ARQUIVOS ******************************************/
 
 FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
@@ -166,8 +181,15 @@ void testar_arquivo_de_dados(){
 /** BUSCAR **/
 
 // retorna posicao do nó no arquivo de indice ou onde deveria estar
-int busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
+Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
+    // Inicializando informações
+    Info *info = (Info *) malloc(sizeof(Info));
+    info->p_f_indice = -1;      
+    info->p_f_dados = 0;
+    info->pos_vetor_dados = 0;
+    info->encontrou = 0;        
+    
     // pegando metadados do arquivo
     Metadados *md = le_metadados(f_metadados);
 
@@ -175,15 +197,8 @@ int busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     int p_f_indice;
     int p_f_dados;
 
-    // flag para saber se a chave foi encontrada
-    int encontrou = 0;
-
-    // posicao do nó no arquivo de indice ou onde deveria estar
-    int p_f_indice_encontrado = -1;
-
-
     if(md->flag_raiz_folha == 1){
-        // quando a raíz é folha (arquivo de dados), a busca é feita diretamente no arquivo de índice
+        // quando a raíz é folha, a busca é feita diretamente no arquivo de dados
         p_f_indice = -1;
         p_f_dados = 0;
     } else {
@@ -199,33 +214,38 @@ int busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
         for(int i=0; i<4; i++){
 
+            // Chave atual
             int si = pag->s[i];
+
+            // salva a posição do nó atual no arquivo de índice
+            info->p_f_indice = p_f_indice;
 
             if(x < si){ 
                 // buscar em um nó filho anterior à chave s[i]
                 p_f_indice = pag->p[i];
                 
-                //sair do loop
+                //sair do loop for
                 i = 3;
                 
             } else if(i == 3 || pag->s[i+1] == -1) {             // tomar cuidado: considere que aqui o p[i+1] é diferente de -1
                 // buscar em um nó filho posterior à chave s[i]
                 p_f_indice = pag->p[i+1];
 
-                //sair do loop
+                //sair do loop for
                 i = 3;
             }
 
         }
 
-        libera_no(pag);
-
         if(pag->flag_aponta_folha){
             // se a página aponta para o arquivo de dados, ir para busca no arquivo de dados
             p_f_dados = p_f_indice;
-            p_f_indice_encontrado = p_f_indice;
+
+            // sair do loop while
             p_f_indice = -1;
         }
+
+        libera_no(pag);
 
     }
 
@@ -236,67 +256,74 @@ int busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
         for(int i=0; i<4; i++){
 
+            // Chave atual
             int cod_cliente = pag_dados->s[i]->codCliente;
 
-            if(cod_cliente > x || cod_cliente == -1){
-                // não achou
+            if(cod_cliente == x) {
 
-                // sair do loop
-                i = 3;
-                p_f_dados = -1;
-
-            } else if(cod_cliente == x) {
                 // achou
-                encontrou = 1;
+                info->encontrou = 1;
+                info->p_f_dados = p_f_dados;
+                info->pos_vetor_dados = i;
 
-                // sair do loop
+                // sair do loop for e while
                 i = 3;
                 p_f_dados = -1;
-            } 
+
+            } else if(cod_cliente > x || cod_cliente == -1 || i == 3) {
+
+                // não achou
+                info->p_f_dados = p_f_dados;
+                info->pos_vetor_dados = i;      
+
+                // sair do loop for e while
+                i = 3;
+                p_f_dados = -1;  
+
+            } else {
+                // continua buscando ...
+            }
 
         }
 
         libera_no_dados(pag_dados);
 
-    }
-
-    if(encontrou == 1){
-        printf("Chave encontrada na posição %d no arquivo de indice.\n", p_f_indice_encontrado);
-    } else {
-        printf("Chave não encontrada. Deveria estar na posição %d no arquivo de indice\n", p_f_indice_encontrado);
-    }    
+    }  
 
     free(md);
-    return p_f_indice_encontrado;
+    return info;
 
 }
 
 /** INSERIR  **/
 
-void inserir(Cliente *cli, FILE *fmd, FILE *fd){
+void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     // pegando metadados do arquivo
-    Metadados *md = le_metadados(fmd);
+    Metadados *md = le_metadados(f_metadados);
 
     if(md->pont_raiz == -1){  // nenhum cliente foi inserido ainda
 
         // Criação de nó de dados e inserção do primeiro cliente
         NoDados * nd = no_dados();
         nd = inserir_cliente_em_no_dado(nd, cli);
-        salva_no_dados(nd, fd);
+        salva_no_dados(nd, f_dados);
         libera_no_dados(nd);
 
         // atualização do arquivo de metadados
         md->pont_raiz = 0;
         md->flag_raiz_folha = 1;
-        salva_metadados(md, fmd);
+        salva_metadados(md, f_metadados);
 
-        // ler_arquivo_de_dados(fd);
-        // Metadados *teste_md = le_metadados(fmd);
+        // ler_arquivo_de_dados(f_dados);
+        // Metadados *teste_md = le_metadados(f_metadados);
         // imprime_metadados(teste_md);
         // free(teste_md);
 
-    } else { 
+    } else {// há clientes inseridos na base
+
+        // posição que deveria estar no arquivo de índice
+        Info * pos_f_indice = busca(cli->codCliente, f_metadados, f_indice, f_dados);
 
         
 
@@ -321,9 +348,15 @@ int main(void){
     FILE *fd = abrir_arquivo_leitura_escrita("dados.dat", fd);
     
     {
-        inserir(cliente(3,"ze das couve"), fmd, fd);
-        busca(3, fmd, fi, fd);
-        busca(2, fmd, fi, fd);
+        Info *a;
+        inserir(cliente(3,"ze das couve"), fmd, fi, fd);
+        a = busca(3, fmd, fi, fd);
+        imprime_info(a);
+        free(a);
+        
+        a = busca(2, fmd, fi, fd);
+        imprime_info(a);
+        free(a);
     }
     
 
