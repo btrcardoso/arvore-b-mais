@@ -11,7 +11,7 @@
 typedef struct Info{
     int p_f_indice;       // posição no arquivo de índice. se -1, então a raíz é folha. Se for maior que -1 então é uma posição do arquivo mesmo
     int p_f_dados;        // posicao no arquivo de dados 
-    int pos_vetor_dados;// posicao no vetor de dados ou posição que deveria estar no vetor de dados. se for = 4 é pq o vetor de dados esta cheio e deve ser particionado.
+    int pos_vetor_dados;  // posicao no vetor de dados ou posição que deveria estar no vetor de dados. [0,4]
     int encontrou;         // verifica se já existe cliente com o codigo buscado no arquivo de dados
 } Info;
 
@@ -20,7 +20,7 @@ void imprime_info(Info *info){
     printf("Posição do nó no arquivo de índice: %d\n", info->p_f_indice);
     printf("Posicao do nó no arquivo de dados: %d\n", info->p_f_dados);
     printf("Posicao que o cliente está ou deveria no vetor S do nó de dados: %d\n", info->pos_vetor_dados);
-    printf("Encontramos? %d\n", info->encontrou);
+    printf("Encontramos? %d\n\n", info->encontrou);
 }
 
 /****************************************** FUNÇÕES PARA ABERTURA DE ARQUIVOS ******************************************/
@@ -133,8 +133,8 @@ void inserir_no_arquivo_de_dados(FILE *out){
     for(int i=0; i<4; i++){
         n = no_dados();
         n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
-        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
         n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
+        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
         n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
         
         salva_no_dados(n, out);
@@ -187,7 +187,7 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     Info *info = (Info *) malloc(sizeof(Info));
     info->p_f_indice = -1;      
     info->p_f_dados = 0;
-    info->pos_vetor_dados = 0;
+    info->pos_vetor_dados = -1;
     info->encontrou = 0;        
     
     // pegando metadados do arquivo
@@ -274,7 +274,7 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
                 // não achou
                 info->p_f_dados = p_f_dados;
-                info->pos_vetor_dados = i;      
+                info->pos_vetor_dados = i;  
 
                 // sair do loop for e while
                 i = 3;
@@ -299,13 +299,22 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
 void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
+    rewind(f_metadados);
+    rewind(f_indice);
+    rewind(f_dados);
+
     // pegando metadados do arquivo
     Metadados *md = le_metadados(f_metadados);
+
+    NoDados * nd = no_dados();
+    NoDados * nd2;
+
+    Info * info;
 
     if(md->pont_raiz == -1){  // nenhum cliente foi inserido ainda
 
         // Criação de nó de dados e inserção do primeiro cliente
-        NoDados * nd = no_dados();
+        nd = no_dados();
         nd = inserir_cliente_em_no_dado(nd, cli);
         salva_no_dados(nd, f_dados);
         libera_no_dados(nd);
@@ -322,15 +331,47 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     } else {// há clientes inseridos na base
 
-        // posição que deveria estar no arquivo de índice
-        Info * pos_f_indice = busca(cli->codCliente, f_metadados, f_indice, f_dados);
+        info = busca(cli->codCliente, f_metadados, f_indice, f_dados);
+        imprime_info(info);
+
+        if(info->encontrou == 1){
+            printf("Não é possível inserir o cliente com o código %d, pois este código já existe no arquivo de dados", cli->codCliente);
+            free(cli);
+            free(md);
+            free(info);
+            return;
+        }
+
+        nd = buscar_no_dados(info->p_f_dados, f_dados);
+
+        if(nd == NULL){
+
+        } 
+
+        if(nd->m >= 4){
+            // Nó de dados cheio. Crie o segundo nó
+
+            
+            // nd2 = no_dados();
+            // nd2 = inserir_cliente_em_no_dado(nd2, cli);
+            // fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
+            // salva_no_dados(nd2, f_dados);
+            // libera_no_dados(nd2);
+
+        } else {
+            nd = inserir_cliente_em_no_dado(nd, cli);
+            fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
+            salva_no_dados(nd, f_dados);
+            libera_no_dados(nd);
+        }
+        
 
         
 
     }
 
     
-
+    free(info);
     free(cli);
     free(md);
 }
@@ -349,14 +390,27 @@ int main(void){
     
     {
         Info *a;
-        inserir(cliente(3,"ze das couve"), fmd, fi, fd);
-        a = busca(3, fmd, fi, fd);
-        imprime_info(a);
-        free(a);
+        inserir(cliente(3,"courtney"), fmd, fi, fd);
+        inserir(cliente(4,"dj"), fmd, fi, fd);
+        inserir(cliente(1,"ana"), fmd, fi, fd);
+        inserir(cliente(1,"barbie"), fmd, fi, fd);
+
+        // a = busca(1, fmd, fi, fd);
+        // imprime_info(a);
+        // free(a);
+        // a = busca(5, fmd, fi, fd);
+        // imprime_info(a);
+        // free(a);
+        // a = busca(3, fmd, fi, fd);
+        // imprime_info(a);
+        // free(a);
+        // a = busca(4, fmd, fi, fd);
+        // imprime_info(a);
+        // free(a);
+       
         
-        a = busca(2, fmd, fi, fd);
-        imprime_info(a);
-        free(a);
+
+        ler_arquivo_de_dados(fd);
     }
     
 

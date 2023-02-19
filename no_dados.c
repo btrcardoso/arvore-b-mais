@@ -134,7 +134,25 @@ NoDados * inserir_cliente_em_no_dado(NoDados* no_dados, Cliente *cli){
         no_dados->s[qtd] = cli;
         no_dados->m += 1;
 
-       // no_dados->s = vetor de clientes ordenados 
+
+        // ordenação bolha
+        int i, j, n = no_dados->m;
+        Cliente *aux;
+
+        for(i=n-1;i>0;i--){
+        
+            for(j=0;j<i;j++){
+            
+                if(no_dados->s[j]->codCliente > no_dados->s[j+1]->codCliente){
+                    aux = no_dados->s[j];
+                    no_dados->s[j] = no_dados->s[j+1];
+                    no_dados->s[j+1] = aux;
+                }
+                
+            }
+
+        }    
+
     }
 
     return no_dados;
