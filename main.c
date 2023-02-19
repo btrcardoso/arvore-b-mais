@@ -188,7 +188,7 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     info->p_f_indice = -1;      
     info->p_f_dados = 0;
     info->pos_vetor_dados = -1;
-    info->encontrou = 0;        
+    info->encontrou = -1;        
     
     // pegando metadados do arquivo
     Metadados *md = le_metadados(f_metadados);
@@ -273,6 +273,7 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             } else if(cod_cliente > x || cod_cliente == -1 || i == 3) {
 
                 // não achou
+                info->encontrou = 0;
                 info->p_f_dados = p_f_dados;
                 info->pos_vetor_dados = i;  
 
@@ -290,8 +291,48 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     }  
 
+    imprime_info(info);
+
     free(md);
     return info;
+
+}
+
+Cliente ** vetor_ordenado(Cliente **s, Cliente *novo_cli){
+
+    // inicia um novo vetor de 5 posições
+    Cliente ** novo_vetor = (Cliente **) malloc(sizeof(Cliente*) * 5);
+
+    // adiciona novo cliente no vetor de 5 posições
+    for(int i = 0; i<5; i++){
+        //novo_vetor[i] = (Cliente *) malloc(sizeof(Cliente *));
+
+        if(i<4){
+            novo_vetor[i] = s[i];
+        } else {
+            novo_vetor[i] = novo_cli;
+        }
+    }
+
+    // ordenação bolha
+    int i, j, n = 5;
+    Cliente *aux;
+
+    for(i=n-1;i>0;i--){
+    
+        for(j=0;j<i;j++){
+        
+            if(novo_vetor[j]->codCliente > novo_vetor[j+1]->codCliente){
+                aux = novo_vetor[j];
+                novo_vetor[j] = novo_vetor[j+1];
+                novo_vetor[j+1] = aux;
+            }
+            
+        }
+
+    } 
+
+    return novo_vetor;
 
 }
 
@@ -306,8 +347,7 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     // pegando metadados do arquivo
     Metadados *md = le_metadados(f_metadados);
 
-    NoDados * nd = no_dados();
-    NoDados * nd2;
+    NoDados * nd;
 
     Info * info;
 
@@ -332,7 +372,6 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     } else {// há clientes inseridos na base
 
         info = busca(cli->codCliente, f_metadados, f_indice, f_dados);
-        imprime_info(info);
 
         if(info->encontrou == 1){
             printf("Não é possível inserir o cliente com o código %d, pois este código já existe no arquivo de dados", cli->codCliente);
@@ -349,10 +388,25 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
         } 
 
         if(nd->m >= 4){
-            // Nó de dados cheio. Crie o segundo nó
+            // Nó de dados cheio. Particionar o nó de dados 
+            NoDados *nd1 = no_dados();
+            NoDados *nd2 = no_dados();
+
+            Cliente ** vetor_de_clientes_ordenados = vetor_ordenado(nd->s, cli);
+
+            for(int j = 0; j<5; j++){
+                if(j<2){
+                    inserir_cliente_em_no_dado(nd1, vetor_de_clientes_ordenados[j]);
+                } else {
+                    inserir_cliente_em_no_dado(nd2, vetor_de_clientes_ordenados[j]);
+                }
+            }
+
+            imprime_no_dados(nd1);
+            imprime_no_dados(nd2);
 
             
-            // nd2 = no_dados();
+
             // nd2 = inserir_cliente_em_no_dado(nd2, cli);
             // fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
             // salva_no_dados(nd2, f_dados);
@@ -390,10 +444,11 @@ int main(void){
     
     {
         Info *a;
-        inserir(cliente(3,"courtney"), fmd, fi, fd);
-        inserir(cliente(4,"dj"), fmd, fi, fd);
-        inserir(cliente(1,"ana"), fmd, fi, fd);
-        inserir(cliente(1,"barbie"), fmd, fi, fd);
+        inserir(cliente(30,"courtney"), fmd, fi, fd);
+        inserir(cliente(40,"dj"), fmd, fi, fd);
+        inserir(cliente(10,"ana"), fmd, fi, fd);
+        inserir(cliente(20,"barbie"), fmd, fi, fd);
+        inserir(cliente(15,"krobus"), fmd, fi, fd);
 
         // a = busca(1, fmd, fi, fd);
         // imprime_info(a);
