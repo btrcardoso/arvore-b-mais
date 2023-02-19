@@ -344,11 +344,8 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     rewind(f_indice);
     rewind(f_dados);
 
-    // pegando metadados do arquivo
     Metadados *md = le_metadados(f_metadados);
-
     NoDados * nd;
-
     Info * info;
 
     if(md->pont_raiz == -1){  // nenhum cliente foi inserido ainda
@@ -363,11 +360,6 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
         md->pont_raiz = 0;
         md->flag_raiz_folha = 1;
         salva_metadados(md, f_metadados);
-
-        // ler_arquivo_de_dados(f_dados);
-        // Metadados *teste_md = le_metadados(f_metadados);
-        // imprime_metadados(teste_md);
-        // free(teste_md);
 
     } else {// há clientes inseridos na base
 
@@ -387,13 +379,12 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
         } 
 
-        if(nd->m >= 4){
-            // Nó de dados cheio. Particionar o nó de dados 
+        if(nd->m >= 4){ // Nó de dados cheio. 
+            
+            //O nó nd deve ser particionado em nd1 e nd2 
             NoDados *nd1 = no_dados();
             NoDados *nd2 = no_dados();
-
             Cliente ** vetor_de_clientes_ordenados = vetor_ordenado(nd->s, cli);
-
             for(int j = 0; j<5; j++){
                 if(j<2){
                     inserir_cliente_em_no_dado(nd1, vetor_de_clientes_ordenados[j]);
@@ -401,10 +392,10 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
                     inserir_cliente_em_no_dado(nd2, vetor_de_clientes_ordenados[j]);
                 }
             }
+            free(vetor_de_clientes_ordenados);
 
             imprime_no_dados(nd1);
             imprime_no_dados(nd2);
-
             
 
             // nd2 = inserir_cliente_em_no_dado(nd2, cli);
@@ -412,16 +403,12 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             // salva_no_dados(nd2, f_dados);
             // libera_no_dados(nd2);
 
-        } else {
+        } else { // Nó de dados tem espaço
             nd = inserir_cliente_em_no_dado(nd, cli);
             fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
             salva_no_dados(nd, f_dados);
             libera_no_dados(nd);
         }
-        
-
-        
-
     }
 
     
