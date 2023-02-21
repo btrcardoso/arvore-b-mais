@@ -338,6 +338,10 @@ Cliente ** vetor_ordenado(Cliente **s, Cliente *novo_cli){
 
 /** INSERIR  **/
 
+void inserir_em_arquivo_de_indice(){
+
+}
+
 void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     rewind(f_metadados);
@@ -394,14 +398,14 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             }
             free(vetor_de_clientes_ordenados);
 
-            imprime_no_dados(nd1);
-            imprime_no_dados(nd2);
-            
+            // descobrir quem é o pai no arquivo de indice
 
-            // nd2 = inserir_cliente_em_no_dado(nd2, cli);
+            // salvando o primeiro nó no arquivo de dados
+            // nd1->ppai = nd->ppai;
             // fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
-            // salva_no_dados(nd2, f_dados);
-            // libera_no_dados(nd2);
+            // salva_no_dados(nd1, f_dados);
+            // libera_no_dados(nd1);
+
 
         } else { // Nó de dados tem espaço
             nd = inserir_cliente_em_no_dado(nd, cli);
