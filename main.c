@@ -17,7 +17,7 @@ typedef struct Info{
 
 
 void imprime_info(Info *info){
-    printf("Posição do nó no arquivo de índice: %d\n", info->p_f_indice);
+    printf("\nPosição do nó no arquivo de índice: %d\n", info->p_f_indice);
     printf("Posicao do nó no arquivo de dados: %d\n", info->p_f_dados);
     printf("Posicao que o cliente está ou deveria no vetor S do nó de dados: %d\n", info->pos_vetor_dados);
     printf("Encontramos? %d\n\n", info->encontrou);
@@ -374,9 +374,21 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
         // atualizacao do ponteiro raiz no arquivo de metadados
         atualiza_arquivo_metadados(f_metadados, no_pai_p_f_indice, 0);
 
-        // atualização do pai dos nós filhos
+        // atualização do pai do filho esquerdo no arquivo de dados
+        NoDados *nd1 = buscar_no_dados(p_filho_esq, f_dados);
+        nd1->ppai = no_pai_p_f_indice;
+        fseek(f_dados, tamanho_no_dados() * p_filho_esq, SEEK_SET);
+        salva_no_dados(nd1, f_dados);
+        libera_no_dados(nd1);
 
+        // atualização do pai do filho direito no arquivo de dados
+        NoDados *nd2 = buscar_no_dados(p_filho_dir, f_dados);
+        nd2->ppai = no_pai_p_f_indice;
+        fseek(f_dados, tamanho_no_dados() * p_filho_dir, SEEK_SET);
+        salva_no_dados(nd2, f_dados);
+        libera_no_dados(nd2);
 
+        // liberar nó pai
         libera_no(no_pai);
 
     } else { // o nó esquerdo tem um pai no arquivo de índice
@@ -448,12 +460,12 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
 
             //salvando o primeiro nó no arquivo de dados
-            nd1->ppai = nd->ppai;    // OBSERVAR QUEM É ESSE PAI DEPOIS
+            nd1->ppai = nd->ppai;    
             fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
             salva_no_dados(nd1, f_dados);
 
             //salvando o segundo nó no arquivo de dados
-            nd2->ppai = nd->ppai;    // OBSERVAR QUEM É ESSE PAI DEPOIS
+            nd2->ppai = nd->ppai;    
             fseek(f_dados, 0, SEEK_END);
             salva_no_dados(nd2, f_dados);
             int nd2_p_f_dados = (ftell(f_dados) / tamanho_no_dados()) - 1;
@@ -508,15 +520,13 @@ int main(void){
         // a = busca(3, fmd, fi, fd);
         // imprime_info(a);
         // free(a);
-        // a = busca(30, fmd, fi, fd);
-        // imprime_info(a);
-        // free(a);
-       
         
-
+       
+    
         ler_arquivo_de_dados(fd);
         ler_arquivo_de_indice(fi);
         ler_arquivo_de_metadados(fmd);
+
     }
     
 
