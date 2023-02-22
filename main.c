@@ -391,7 +391,50 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
         // liberar nó pai
         libera_no(no_pai);
 
-    } else { // o nó esquerdo tem um pai no arquivo de índice
+    } else { // o nó filho esquerdo tem um pai no arquivo de índice
+
+        No *no_pai = buscar_no(p_f_indice, f_indice);
+
+        if(no_pai->m < 4){ // O nó tem espaço 
+
+            // insere a chave no nó 
+            inserir_chave_em_no(no_pai, chave, -1 /* conferir se é -1 ou p_filho_esq */, p_filho_dir);
+
+            // salvar nó de indice atualizado
+            fseek(f_indice, tamanho_no() * p_f_indice, SEEK_SET); 
+            salva_no(no_pai, f_indice);                                    
+            
+            // atualização do pai do filho direito no arquivo de indice/dados
+            if(no_pai->flag_aponta_folha == 0){
+
+                // atualização do pai do filho direito no arquivo de indice
+                No *nd = buscar_no(p_filho_dir, f_indice);
+                nd->ppai = p_f_indice;
+                fseek(f_indice, tamanho_no() * p_filho_dir, SEEK_SET);
+                salva_no(nd, f_indice);
+                libera_no(nd);
+
+            } else if(no_pai->flag_aponta_folha == 1){
+
+                // atualização do pai do filho direito no arquivo de dados
+                NoDados *nd2 = buscar_no_dados(p_filho_dir, f_dados);
+                nd2->ppai = p_f_indice;
+                fseek(f_dados, tamanho_no_dados() * p_filho_dir, SEEK_SET);
+                salva_no_dados(nd2, f_dados);
+                libera_no_dados(nd2);
+
+            }
+
+            // liberar nó pai
+            libera_no(no_pai);
+
+        } else { // O nó de indice está cheio e deve ser particionado
+
+            printf("Nó cheio. Tratar. sair.");
+            exit(1);
+        
+        }
+        
 
     }
 
@@ -453,12 +496,6 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             }
             free(vetor_de_clientes_ordenados);
 
-            // descobrir quem é o pai no arquivo de indice
-            /*
-             ESTAMOS AQUI
-            */
-
-
             //salvando o primeiro nó no arquivo de dados
             nd1->ppai = nd->ppai;    
             fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
@@ -505,11 +542,14 @@ int main(void){
     
     {
         Info *a;
-        inserir(cliente(30,"courtney"), fmd, fi, fd);
-        inserir(cliente(40,"dj"), fmd, fi, fd);
-        inserir(cliente(10,"ana"), fmd, fi, fd);
-        inserir(cliente(20,"barbie"), fmd, fi, fd);
-        inserir(cliente(15,"krobus"), fmd, fi, fd);
+        inserir(cliente(30, "cli30"), fmd, fi, fd);
+        inserir(cliente(40, "cli40"), fmd, fi, fd);
+        inserir(cliente(10, "cli10"), fmd, fi, fd);
+        inserir(cliente(20, "cli20"), fmd, fi, fd);
+        inserir(cliente(15, "cli15"), fmd, fi, fd);
+        inserir(cliente(19, "cli19"), fmd, fi, fd);
+        inserir(cliente(18, "cli18"), fmd, fi, fd);
+        //inserir(cliente(17, "cli17"), fmd, fi, fd);
 
         // a = busca(1, fmd, fi, fd);
         // imprime_info(a);
