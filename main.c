@@ -158,10 +158,12 @@ void ler_arquivo_de_dados(FILE *in){
     
     rewind(in);
     NoDados *nd;
+    int cont = 0;
     while((nd = le_no_dados(in)) != NULL){
-        printf("\n");
+        printf("\n%d:\n", cont);
         imprime_no_dados(nd);
         libera_no_dados(nd);
+        cont++;
     }
 
 }
@@ -356,6 +358,15 @@ funcao de inserir no arquivo de indice precisa:
     posicao filho direito no arquivo (Q)
 */
 
+// Atualiza o pai de um nó_dado no arquivo de dados
+void atualiza_pai_de_no_dado(FILE *f_dados, int p_f_dados, int ppai){
+    NoDados *nd = buscar_no_dados(p_f_dados, f_dados);
+    nd->ppai = ppai;
+    fseek(f_dados, tamanho_no_dados() * p_f_dados, SEEK_SET);
+    salva_no_dados(nd, f_dados);
+    libera_no_dados(nd);
+}
+
 // recebe dois nós filhos e dá um pai pra eles
 void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_folha, int p_filho_esq, int p_filho_dir, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
@@ -374,19 +385,9 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
         // atualizacao do ponteiro raiz no arquivo de metadados
         atualiza_arquivo_metadados(f_metadados, no_pai_p_f_indice, 0);
 
-        // atualização do pai do filho esquerdo no arquivo de dados
-        NoDados *nd1 = buscar_no_dados(p_filho_esq, f_dados);
-        nd1->ppai = no_pai_p_f_indice;
-        fseek(f_dados, tamanho_no_dados() * p_filho_esq, SEEK_SET);
-        salva_no_dados(nd1, f_dados);
-        libera_no_dados(nd1);
-
-        // atualização do pai do filho direito no arquivo de dados
-        NoDados *nd2 = buscar_no_dados(p_filho_dir, f_dados);
-        nd2->ppai = no_pai_p_f_indice;
-        fseek(f_dados, tamanho_no_dados() * p_filho_dir, SEEK_SET);
-        salva_no_dados(nd2, f_dados);
-        libera_no_dados(nd2);
+        // atualização do pai do filho esquerdo e direito no arquivo de dados
+        atualiza_pai_de_no_dado(f_dados, p_filho_esq, no_pai_p_f_indice);
+        atualiza_pai_de_no_dado(f_dados, p_filho_dir, no_pai_p_f_indice);
 
         // liberar nó pai
         libera_no(no_pai);
@@ -417,11 +418,7 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
             } else if(no_pai->flag_aponta_folha == 1){
 
                 // atualização do pai do filho direito no arquivo de dados
-                NoDados *nd2 = buscar_no_dados(p_filho_dir, f_dados);
-                nd2->ppai = p_f_indice;
-                fseek(f_dados, tamanho_no_dados() * p_filho_dir, SEEK_SET);
-                salva_no_dados(nd2, f_dados);
-                libera_no_dados(nd2);
+                atualiza_pai_de_no_dado(f_dados, p_filho_dir, p_f_indice);
 
             }
 
@@ -549,7 +546,10 @@ int main(void){
         inserir(cliente(15, "cli15"), fmd, fi, fd);
         inserir(cliente(19, "cli19"), fmd, fi, fd);
         inserir(cliente(18, "cli18"), fmd, fi, fd);
-        //inserir(cliente(17, "cli17"), fmd, fi, fd);
+        inserir(cliente(17, "cli17"), fmd, fi, fd);
+        inserir(cliente(50, "cli50"), fmd, fi, fd);
+        inserir(cliente(16, "cli16"), fmd, fi, fd);
+        inserir(cliente(60, "cli60"), fmd, fi, fd);
 
         // a = busca(1, fmd, fi, fd);
         // imprime_info(a);
