@@ -291,7 +291,7 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     }  
 
-    imprime_info(info);
+    //imprime_info(info);
 
     free(md);
     return info;
@@ -338,7 +338,37 @@ Cliente ** vetor_ordenado(Cliente **s, Cliente *novo_cli){
 
 /** INSERIR  **/
 
-void inserir_em_arquivo_de_indice(){
+/*
+funcao de inserir no arquivo de indice precisa:
+
+    posicao do nó W no arquivo de ínidice 
+    flag_aponta_folha
+    posicao filho esqquerdo no arquivo (P)
+    posicao filho direito no arquivo (Q)
+*/
+
+// recebe dois nós filhos e dá um pai pra eles
+void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_folha, int p_filho_esq, int p_filho_dir){
+
+    if(p_f_indice == -1){ // nós filhos são folhas e não tem pai
+
+        // criacao no nó de índice
+        No *no_pai = no();
+        inserir_chave_em_no(no_pai, chave, p_filho_esq, p_filho_dir);
+        no_pai->flag_aponta_folha = 1;
+
+        // salvar nó de indice
+
+        // atualizacao do ponteiro raiz no arquivo de metadados
+
+        // atualização do pai dos nós filhos
+
+
+        free(no_pai);
+
+    } else { // o nó esquerdo tem um pai no arquivo de índice
+
+    }
 
 }
 
@@ -399,12 +429,25 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             free(vetor_de_clientes_ordenados);
 
             // descobrir quem é o pai no arquivo de indice
+            /*
+             ESTAMOS AQUI
+            */
 
-            // salvando o primeiro nó no arquivo de dados
-            // nd1->ppai = nd->ppai;
-            // fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
-            // salva_no_dados(nd1, f_dados);
-            // libera_no_dados(nd1);
+
+            //salvando o primeiro nó no arquivo de dados
+            nd1->ppai = nd->ppai;    // OBSERVAR QUEM É ESSE PAI DEPOIS
+            fseek(f_dados, tamanho_no_dados() * info->p_f_dados, SEEK_SET);
+            salva_no_dados(nd1, f_dados);
+            libera_no_dados(nd1);
+
+            //salvando o segundo nó no arquivo de dados
+            nd2->ppai = nd->ppai;    // OBSERVAR QUEM É ESSE PAI DEPOIS
+            fseek(f_dados, 0, SEEK_END);
+            salva_no_dados(nd2, f_dados);
+            libera_no_dados(nd2);
+            int nd2_p_f_dados = (ftell(f_dados) / tamanho_no_dados()) - 1;
+
+            inserir_em_arquivo_de_indice(nd2->s[0]->codCliente, nd->ppai, 1, info->p_f_dados, nd2_p_f_dados);
 
 
         } else { // Nó de dados tem espaço
@@ -450,7 +493,7 @@ int main(void){
         // a = busca(3, fmd, fi, fd);
         // imprime_info(a);
         // free(a);
-        // a = busca(4, fmd, fi, fd);
+        // a = busca(30, fmd, fi, fd);
         // imprime_info(a);
         // free(a);
        
