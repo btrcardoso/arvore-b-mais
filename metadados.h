@@ -10,3 +10,5 @@ Metadados * le_metadados(FILE *in);
 void imprime_metadados(Metadados *md);
 
 void salva_metadados(Metadados *md, FILE *out);
+
+void atualiza_arquivo_metadados(FILE *out, int pont_raiz, int flag_raiz_folha);

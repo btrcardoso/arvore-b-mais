@@ -29,3 +29,11 @@ void salva_metadados(Metadados *md, FILE *out){
     fwrite(&md->flag_raiz_folha, sizeof(int), 1, out);
 
 }
+
+void atualiza_arquivo_metadados(FILE *out, int pont_raiz, int flag_raiz_folha){
+    Metadados *md = le_metadados(out);
+    md->pont_raiz = pont_raiz;
+    md->flag_raiz_folha = flag_raiz_folha;
+    salva_metadados(md, out);
+    free(md);
+}
