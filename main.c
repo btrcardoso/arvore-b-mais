@@ -309,7 +309,9 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
 }
 
-Cliente ** vetor_ordenado(Cliente **s, Cliente *novo_cli){
+
+
+Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
 
     // inicia um novo vetor de 5 posições
     Cliente ** novo_vetor = (Cliente **) malloc(sizeof(Cliente*) * 5);
@@ -483,7 +485,7 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
             //O nó nd deve ser particionado em nd1 e nd2 
             NoDados *nd1 = no_dados();
             NoDados *nd2 = no_dados();
-            Cliente ** vetor_de_clientes_ordenados = vetor_ordenado(nd->s, cli);
+            Cliente ** vetor_de_clientes_ordenados = vetor_clientes_ordenado(nd->s, cli);
             for(int j = 0; j<5; j++){
                 if(j<2){
                     inserir_cliente_em_no_dado(nd1, vetor_de_clientes_ordenados[j]);
@@ -543,21 +545,21 @@ int main(void){
         inserir(cliente(40, "cli40"), fmd, fi, fd);
         inserir(cliente(10, "cli10"), fmd, fi, fd);
         inserir(cliente(20, "cli20"), fmd, fi, fd);
-        inserir(cliente(15, "cli15"), fmd, fi, fd);
+        inserir(cliente(11, "cli11"), fmd, fi, fd);
         inserir(cliente(19, "cli19"), fmd, fi, fd);
         inserir(cliente(18, "cli18"), fmd, fi, fd);
         inserir(cliente(17, "cli17"), fmd, fi, fd);
         inserir(cliente(50, "cli50"), fmd, fi, fd);
-        inserir(cliente(16, "cli16"), fmd, fi, fd);
+        inserir(cliente(12, "cli12"), fmd, fi, fd);
         inserir(cliente(60, "cli60"), fmd, fi, fd);
+        inserir(cliente(31, "cli31"), fmd, fi, fd);
+        inserir(cliente(32, "cli32"), fmd, fi, fd);
+        inserir(cliente(33, "cli33"), fmd, fi, fd);
+        inserir(cliente(61, "cli61"), fmd, fi, fd);
+        inserir(cliente(13, "cli13"), fmd, fi, fd);
+        //inserir(cliente(14, "cli14"), fmd, fi, fd);
 
-        // a = busca(1, fmd, fi, fd);
-        // imprime_info(a);
-        // free(a);
-        // a = busca(5, fmd, fi, fd);
-        // imprime_info(a);
-        // free(a);
-        // a = busca(3, fmd, fi, fd);
+        // a = busca(14, fmd, fi, fd);
         // imprime_info(a);
         // free(a);
         
