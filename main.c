@@ -309,6 +309,66 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
 }
 
+// Estrutura similar ao Nó, mas possui uma chave e ponteiro a mais.
+typedef struct NoAuxiliar{
+    int s[5];               // Vetor de chaves s0, s1, s2, s3, s4
+    int p[6];               // Vetor de ponteiros no arquivo para nós p0, p1, p2, p3, p4, p5
+} NoAuxiliar;
+
+void imprime_no_auxiliar(NoAuxiliar *no_auxiliar){
+
+    if(no_auxiliar == NULL){ 
+        printf("Nó auxiliar nulo\n");
+        return;
+    }
+    printf("(");
+    for(int i=0; i<5; i++){
+        printf("p%d=%d), (s%d=%d, ", i, no_auxiliar->p[i], i, no_auxiliar->s[i]);
+    }
+    printf("p%d=%d)\n", 5, no_auxiliar->p[5]);
+}
+
+NoAuxiliar * no_auxiliar_ordenado(No *no, int novo_s, int novo_p){
+
+    // inicia um novo nó, com 1 chave e 1 ponteiro a mais
+    NoAuxiliar *no_auxiliar = (NoAuxiliar *) malloc(sizeof(NoAuxiliar));
+
+    // adiciona chaves e ponteiros no nó auxiliar
+    for(int i=0; i<5; i++){
+        no_auxiliar->p[i] = no->p[i];
+        if(i<4) no_auxiliar->s[i] = no->s[i];
+    }
+    no_auxiliar->s[4] = novo_s;
+    no_auxiliar->p[5] = novo_p;
+
+    // ordenação bolha
+    int i, j, n = 5;
+    int aux_s, aux_p;
+
+    for(i=n-1;i>0;i--){
+    
+        for(j=0;j<i;j++){
+        
+            if(no_auxiliar->s[j] > no_auxiliar->s[j+1]){
+                aux_s = no_auxiliar->s[j];
+                aux_p = no_auxiliar->p[j+1];
+
+                no_auxiliar->s[j] = no_auxiliar->s[j+1];
+                no_auxiliar->p[j+1] = no_auxiliar->p[j+2];
+
+                no_auxiliar->s[j+1] = aux_s;
+                no_auxiliar->p[j+2] = aux_p;
+
+            }
+            
+        }
+
+    } 
+
+    return no_auxiliar;
+
+}
+
 
 
 Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
@@ -429,8 +489,38 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
 
         } else { // O nó de indice está cheio e deve ser particionado
 
-            printf("Nó cheio. Tratar. sair.");
-            exit(1);
+            //O nó nd deve ser particionado em nd1 e nd2 
+            No *n1 = no();
+            n1->flag_aponta_folha = no_pai->flag_aponta_folha;
+            No *n2 = no();
+            n2->flag_aponta_folha = no_pai->flag_aponta_folha;
+
+            // criacao de no auxiliar ordenado
+            NoAuxiliar *no_auxiliar = no_auxiliar_ordenado(no_pai, chave, p_filho_dir);
+            
+            // divisao de chaves e ponteiros para o no esquerdo
+            inserir_chave_em_no(n1, no_auxiliar->s[0], no_auxiliar->p[0], no_auxiliar->p[1]);
+            inserir_chave_em_no(n1, no_auxiliar->s[1], -1, no_auxiliar->p[2]);
+
+            // divisao de chaves e ponteiros para o no direito
+            inserir_chave_em_no(n2, no_auxiliar->s[3], no_auxiliar->p[3], no_auxiliar->p[4]);
+            inserir_chave_em_no(n2, no_auxiliar->s[4], -1, no_auxiliar->p[5]);
+
+            //** ESTAMOS AQUI. CONFERIR QUESTAO DE PAI E PROPAGACAO  ***//
+
+            // salvar no esquerdo no mesmo lugar de no_pai
+
+            // salvar no direito no fim do arquivo
+
+            // criar um novo nó pai para o filho esquerdo e direito
+
+            // atualizar o pai do filho esquerdo e direito
+
+            // atualizar metadados?
+
+
+            //libera_no_auxiliar(no_auxiliar);
+            
         
         }
         
