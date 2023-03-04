@@ -513,8 +513,6 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
             inserir_chave_em_no(n2, no_auxiliar->s[3], no_auxiliar->p[3], no_auxiliar->p[4]);
             inserir_chave_em_no(n2, no_auxiliar->s[4], -1, no_auxiliar->p[5]);
 
-            //** ESTAMOS AQUI. CONFERIR QUESTAO DE PAI E PROPAGACAO  ***//
-
             // salvar no esquerdo no mesmo lugar de no_pai
             fseek(f_indice, tamanho_no() * p_f_indice, SEEK_SET); 
             salva_no(n1, f_indice);
@@ -535,30 +533,48 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
                 
             }
 
-            // criar um novo nó pai para o filho esquerdo e direito
-            No *novo_pai = no();
-            inserir_chave_em_no(novo_pai, no_auxiliar->s[2], n1_p_f_indice, n2_p_f_indice);
-            novo_pai->flag_aponta_folha = 0;
-            novo_pai->ppai = no_pai->ppai;
-            
-            // salvar novo nó pai
-            fseek(f_indice, 0, SEEK_END);                                  
-            salva_no(novo_pai, f_indice);                                    
-            int novo_pai_p_f_indice = (ftell(f_indice) / tamanho_no()) - 1; 
+            //** ESTAMOS AQUI. CONFERIR QUESTAO DE PAI E PROPAGACAO  ***//
 
-            // atualizar o pai do filho esquerdo e direito
-            atualiza_pai_de_no(f_indice, n1_p_f_indice, novo_pai_p_f_indice);
-            atualiza_pai_de_no(f_indice, n2_p_f_indice, novo_pai_p_f_indice);
+            if(no_pai->ppai == -1){
 
-            // atualizacao do ponteiro raiz no arquivo de metadados, se necessário
-            if(novo_pai->ppai == -1){
-                atualiza_arquivo_metadados(f_metadados, novo_pai_p_f_indice, 0);
+                // criar um novo nó pai para o filho esquerdo e direito
+                No *novo_pai = no();
+                inserir_chave_em_no(novo_pai, no_auxiliar->s[2], n1_p_f_indice, n2_p_f_indice);
+                novo_pai->flag_aponta_folha = 0;
+                novo_pai->ppai = no_pai->ppai;
+                
+                // salvar novo nó pai
+                fseek(f_indice, 0, SEEK_END);                                  
+                salva_no(novo_pai, f_indice);                                    
+                int novo_pai_p_f_indice = (ftell(f_indice) / tamanho_no()) - 1; 
+
+                // atualizar o pai do filho esquerdo e direito
+                atualiza_pai_de_no(f_indice, n1_p_f_indice, novo_pai_p_f_indice);
+                atualiza_pai_de_no(f_indice, n2_p_f_indice, novo_pai_p_f_indice);
+
+                // atualizacao do ponteiro raiz no arquivo de metadados, se necessário
+                if(novo_pai->ppai == -1){
+                    atualiza_arquivo_metadados(f_metadados, novo_pai_p_f_indice, 0);
+                }
+
+                libera_no(novo_pai);
+
+            } else {
+                libera_no(no_pai);
+                libera_no(n1);
+                libera_no(n2);
+                //libera_no_auxiliar(no_auxiliar);
+
+                printf("here we are");
+                //propagar. Ainda não foi testado, nao sei se dá certo.
+                return inserir_em_arquivo_de_indice(no_auxiliar->s[2], n1->ppai, 0, n1_p_f_indice, n2_p_f_indice, f_metadados, f_indice, f_dados);
             }
+
+            
 
             libera_no(no_pai);
             libera_no(n1);
             libera_no(n2);
-            libera_no(novo_pai);
             //libera_no_auxiliar(no_auxiliar);
             
         
@@ -689,6 +705,11 @@ int main(void){
         inserir(cliente(13, "cli13"), fmd, fi, fd);
         inserir(cliente(14, "cli14"), fmd, fi, fd);
         inserir(cliente(45, "cli45"), fmd, fi, fd);
+        inserir(cliente(61, "cli61"), fmd, fi, fd);
+        inserir(cliente(63, "cli63"), fmd, fi, fd);
+        inserir(cliente(64, "cli64"), fmd, fi, fd);
+        inserir(cliente(65, "cli65"), fmd, fi, fd);
+        inserir(cliente(100, "cli100"), fmd, fi, fd);
 
         // a = busca(45, fmd, fi, fd);
         // imprime_info(a);
