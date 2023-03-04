@@ -4,6 +4,18 @@ Esta é uma aplicação em C que utiliza a estrutura Árvore B+ para armazenar o
 
 ![](exemplo.PNG)
 
+## Integrantes do grupo
+
+O trabalho foi feito para a disciplina de Estrutura de Dados II, ministrada pelo professor Dr. Ubiratam de Paula, pelos seguintes alunos:
+- Beatriz Cardoso de Souza Silva
+- Leonardo Iglesias Ferreira
+- João Mario de Lima Ferreira
+- Rafael Rocha Aranzate
+
+O código foi feito com base no material fornecido pelo professor.
+
+## Funcionalidades
+
 Nesta aplicação, é possível:
 - Criar estruturas de Clientes
 ```c
@@ -24,7 +36,7 @@ Posição que o cliente está ou deveria no vetor S do nó de dados: 0
 Encontramos? 1
 ```
 
-## Organização do projeto
+## Estruturas utilizadas
 
 O projeto possui quatro estruturas principais:
 - ```Cliente```: Estrutura que armazena código e nome do cliente.
@@ -102,13 +114,3 @@ E para executar, insira no terminal:
 ```bash
 ./prog
 ```
-
-## Integrantes do grupo
-
-O trabalho foi feito para a disciplina de Estrutura de Dados II, ministrada pelo professor Dr. Ubiratam de Paula, pelos seguintes alunos:
-- Beatriz Cardoso de Souza Silva
-- Leonardo Iglesias Ferreira
-- João Mario de Lima Ferreira
-- Rafael Rocha Aranzate
-
-O código foi feito com base no material fornecido pelo professor.
