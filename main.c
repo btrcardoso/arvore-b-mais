@@ -709,7 +709,9 @@ int main(void){
         inserir(cliente(63, "cli63"), fmd, fi, fd);
         inserir(cliente(64, "cli64"), fmd, fi, fd);
         inserir(cliente(65, "cli65"), fmd, fi, fd);
-        inserir(cliente(100, "cli100"), fmd, fi, fd);
+
+        // aqui dá ruim
+        //inserir(cliente(100, "cli100"), fmd, fi, fd);
 
         // a = busca(45, fmd, fi, fd);
         // imprime_info(a);
