@@ -2,7 +2,7 @@
 
 Esta é uma aplicação em C que utiliza a estrutura Árvore B+ para armazenar os registros de Clientes em arquivos binários. 
 
-![](exemplo.png)
+![](exemplo.PNG)
 
 Nesta aplicação, é possível:
 - Criar estruturas de Clientes
