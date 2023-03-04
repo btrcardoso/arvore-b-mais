@@ -108,3 +108,54 @@ int tamanho_no(){
         + sizeof(int) * 4  // s[]
         + sizeof(int) * 5; // p[]
 }
+
+// libera o nó
+void libera_no(No *no){
+    // implementar
+}
+
+// Insere chave em nó
+No * inserir_chave_em_no(No* no, int chave, int p_esq, int p_dir){
+    int qtd = no->m;
+
+    if(qtd >= 4){
+        printf("Não é possível inserir a chave no nó, pois o nó está cheio.\n");
+    
+        // reorganização de acordo com o algoritmo da árvore b+
+        exit(1);
+    } else {
+        no->s[qtd] = chave;                    // chave 
+        if(p_esq != -1) no->p[qtd] = p_esq;    // ponteiro à esquerda da chave (só é colocada na primeira inserção)
+        no->p[qtd+1] = p_dir;                  // ponteiro à direita da chave
+        no->m += 1;
+
+        // ordenação bolha
+        int i, j, n = no->m;
+        int aux_s, aux_p;
+
+        for(i=n-1;i>0;i--){
+        
+            for(j=0;j<i;j++){
+            
+                if(no->s[j] > no->s[j+1]){
+                    aux_s = no->s[j];
+                    aux_p = no->p[j+1];
+
+                    no->s[j] = no->s[j+1];
+                    no->p[j+1] = no->p[j+2];
+
+                    no->s[j+1] = aux_s;
+                    no->p[j+2] = aux_p;
+
+                }
+                
+            }
+
+        } 
+
+    }
+    
+    
+    
+    return NULL;
+}

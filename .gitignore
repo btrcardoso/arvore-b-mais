@@ -1,3 +1,6 @@
 *.exe
 *.dat
 .vscode
+main-2.c
+main-3.c
+main-4.c

@@ -27,3 +27,9 @@ No * buscar_no(int pos, FILE *in);
 // Retorna tamanho do no em bytes
 int tamanho_no();
 
+// libera o nó
+void libera_no(No *no);
+
+// Insere chave em nó
+No * inserir_chave_em_no(No* no, int chave, int p_esq, int p_dir);
+
