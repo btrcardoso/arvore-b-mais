@@ -1,8 +1,30 @@
 # Árvore B+
 
+Esta é uma aplicação em C que utiliza a estrutura Árvore B+ para armazenar os registros de Clientes em arquivos binários. 
+
 ![](exemplo.png)
 
-Aplicação que utiliza a estrutura Árvore B+ para armazenar os registros em um arquivo binário. 
+Nesta aplicação, é possível:
+- Criar estruturas de Clientes
+```c
+Cliente *ze = cliente(10, "Ze");
+```
+- Armazenar dados dos clientes em uma estrutura de arquivos Árvore B+
+```c
+inserir(ze, f_metadados, f_indice, f_dados);
+```
+- Buscar informações dos clientes de acordo com sua chave
+```c
+imprime_resultado_busca(10, f_metadados, f_indice, f_dados);
+```
+```
+Posição do nó no arquivo de índice: 0
+Posição do nó no arquivo de dados: 0
+Posição que o cliente está ou deveria no vetor S do nó de dados: 0
+Encontramos? 1
+```
+
+## Integrantes do grupo
 
 O trabalho foi feito para a disciplina de Estrutura de Dados II, ministrada pelo professor Dr. Ubiratam de Paula, pelos seguintes alunos:
 - Beatriz Cardoso de Souza Silva
@@ -44,7 +66,7 @@ typedef struct NoDados{
 
 ## Organização do arquivo main.c
 
-O arquivo está organizado em 9 blocos:
+O arquivo main.c está organizado em 9 blocos:
 1. INFO: estrutura com informações sobre a busca de uma chave na árvore;
 2. FUNÇÕES PARA ABERTURA DE ARQUIVOS: possui as funções utilizadas para manipulação de arquivos;
 3. FUNÇÕES PARA CRIAÇÃO DOS ARQUIVOS DA ÁRVORE B+: cria os arquivos metadados.dat, dados.dat, indice.dat;
@@ -80,7 +102,10 @@ void teste(FILE * fmd, FILE * fi, FILE * fd){
 
 }
 ```
-![](teste.png)
+
+Árvore criada na função de teste:
+![](teste.jpg)
+
 Ao final, o conteúdo dos arquivos de dados, índice e metadados é exibido.
 
 ## Como executar
