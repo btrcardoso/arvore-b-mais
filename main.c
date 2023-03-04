@@ -7,14 +7,15 @@
 #include "no.c"
 #include "no_dados.c"
 
+/********************************************************* INFO *********************************************************/
 
+// estrutura com informações sobre a busca de uma chave na árvore
 typedef struct Info{
     int p_f_indice;       // posição no arquivo de índice. se -1, então a raíz é folha. Se for maior que -1 então é uma posição do arquivo mesmo
     int p_f_dados;        // posicao no arquivo de dados 
     int pos_vetor_dados;  // posicao no vetor de dados ou posição que deveria estar no vetor de dados. [0,4]
     int encontrou;         // verifica se já existe cliente com o codigo buscado no arquivo de dados
 } Info;
-
 
 void imprime_info(Info *info){
     printf("\nPosição do nó no arquivo de índice: %d\n", info->p_f_indice);
@@ -183,6 +184,7 @@ void testar_arquivo_de_dados(){
 }
 
 /***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE METADADOS *****************************************/
+
 void ler_arquivo_de_metadados(FILE *in){
     printf("\n-----------------------Lendo arquivo de metadados-----------------------\n");
     
@@ -191,8 +193,7 @@ void ler_arquivo_de_metadados(FILE *in){
     free(md);
 }
 
-
-/** BUSCAR **/
+/******************************************************* BUSCAR *******************************************************/
 
 // retorna posicao do nó no arquivo de indice ou onde deveria estar
 Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
@@ -312,12 +313,22 @@ Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
 }
 
+// imprime o resultado de uma busca nos arquivos
+void imprime_resultado_busca(int x, FILE *fmd, FILE *fi, FILE *fd){
+    Info *a = busca(x, fmd, fi, fd);
+    imprime_info(a);
+    free(a);
+}
+
+/************************************************* FUNÇÕES AUXILIARES *************************************************/
+
 // Estrutura similar ao Nó, mas possui uma chave e ponteiro a mais.
 typedef struct NoAuxiliar{
     int s[5];               // Vetor de chaves s0, s1, s2, s3, s4
     int p[6];               // Vetor de ponteiros no arquivo para nós p0, p1, p2, p3, p4, p5
 } NoAuxiliar;
 
+// imprime nó_auxiliar
 void imprime_no_auxiliar(NoAuxiliar *no_auxiliar){
 
     if(no_auxiliar == NULL){ 
@@ -331,6 +342,7 @@ void imprime_no_auxiliar(NoAuxiliar *no_auxiliar){
     printf("p%d=%d)\n", 5, no_auxiliar->p[5]);
 }
 
+// insere uma chave e ponteiro no nó_auxiliar e retorna ele ordenado
 NoAuxiliar * no_auxiliar_ordenado(No *no, int novo_s, int novo_p){
 
     // inicia um novo nó, com 1 chave e 1 ponteiro a mais
@@ -372,8 +384,7 @@ NoAuxiliar * no_auxiliar_ordenado(No *no, int novo_s, int novo_p){
 
 }
 
-
-
+// insere um cliente a um vetor de clientes e retorna ele ordenado
 Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
 
     // inicia um novo vetor de 5 posições
@@ -436,7 +447,7 @@ void atualiza_pai_de_no(FILE *f_indice, int p_f_indice, int ppai){
     libera_no(no);
 }
 
-// recebe dois nós filhos e dá um pai pra eles
+// Recebe uma chave e dois nós filhos. A chave é inserida no arquivo de indice e as folhas ganham um pai
 void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_folha, int p_filho_esq, int p_filho_dir, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     if(p_f_indice == -1){ // nós filhos são folhas e não tem pai
@@ -474,21 +485,11 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
             fseek(f_indice, tamanho_no() * p_f_indice, SEEK_SET); 
             salva_no(no_pai, f_indice);                                    
             
-            // atualização do pai do filho direito no arquivo de indice/dados
+            // atualização do pai do filho direito no arquivo de indice ou dados
             if(no_pai->flag_aponta_folha == 0){
-
-                // atualização do pai do filho direito no arquivo de indice
-                No *nd = buscar_no(p_filho_dir, f_indice);
-                nd->ppai = p_f_indice;
-                fseek(f_indice, tamanho_no() * p_filho_dir, SEEK_SET);
-                salva_no(nd, f_indice);
-                libera_no(nd);
-
+                atualiza_pai_de_no(f_indice, p_filho_dir, p_f_indice);
             } else if(no_pai->flag_aponta_folha == 1){
-
-                // atualização do pai do filho direito no arquivo de dados
                 atualiza_pai_de_no_dado(f_dados, p_filho_dir, p_f_indice);
-
             }
 
             // liberar nó pai
@@ -513,29 +514,26 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
             inserir_chave_em_no(n2, no_auxiliar->s[3], no_auxiliar->p[3], no_auxiliar->p[4]);
             inserir_chave_em_no(n2, no_auxiliar->s[4], -1, no_auxiliar->p[5]);
 
-            // salvar no esquerdo no mesmo lugar de no_pai
+            // salvar nó esquerdo no mesmo lugar de no_pai
             fseek(f_indice, tamanho_no() * p_f_indice, SEEK_SET); 
             salva_no(n1, f_indice);
             int n1_p_f_indice = (ftell(f_indice) / tamanho_no()) - 1;
 
-            // salvar no direito no fim do arquivo
-            fseek(f_indice, 0, SEEK_END);                                  // posiciona ponteiro no fim do arquivo
-            salva_no(n2, f_indice);                                        // salva
-            int n2_p_f_indice = (ftell(f_indice) / tamanho_no()) - 1;      // pega a posição do nó no arquivo
+            // salvar nó direito no fim do arquivo
+            fseek(f_indice, 0, SEEK_END);                                  
+            salva_no(n2, f_indice);                                        
+            int n2_p_f_indice = (ftell(f_indice) / tamanho_no()) - 1;      
             
-            // atualizar o ppai dos filhos do nó filho direito
+            // atualizar o ppai dos filhos do nó_filho_direito
             for(int j = 0; j< n2->m+1 ; j++){
                 if(n2->flag_aponta_folha == 1){
                     atualiza_pai_de_no_dado(f_dados, n2->p[j], n2_p_f_indice);
                 } else {
                     atualiza_pai_de_no(f_indice, n2->p[j], n2_p_f_indice);
                 }
-                
             }
 
-            //** ESTAMOS AQUI. CONFERIR QUESTAO DE PAI E PROPAGACAO  ***//
-
-            if(no_pai->ppai == -1){
+            if(no_pai->ppai == -1){ // Criação de nó pai para nós particionados
 
                 // criar um novo nó pai para o filho esquerdo e direito
                 No *novo_pai = no();
@@ -559,7 +557,8 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
 
                 libera_no(novo_pai);
 
-            } else {
+            } else { // Propagar
+
                 // atualizacao do pai do filho esquerdo e direito
                 atualiza_pai_de_no(f_indice, n1_p_f_indice, no_pai->ppai);
                 atualiza_pai_de_no(f_indice, n2_p_f_indice, no_pai->ppai);
@@ -580,12 +579,12 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
             //libera_no_auxiliar(no_auxiliar);
         
         }
-        
 
     }
 
 }
 
+// Insere cliente no arquivo de dados
 void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     rewind(f_metadados);
@@ -624,7 +623,7 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
         nd = buscar_no_dados(info->p_f_dados, f_dados);
 
         if(nd == NULL){
-
+            
         } 
 
         if(nd->m >= 4){ // Nó de dados cheio. 
@@ -687,35 +686,15 @@ int main(void){
     FILE *fd = abrir_arquivo_leitura_escrita("dados.dat", fd);
     
     {
-        Info *a;
-        inserir(cliente(30, "cli30"), fmd, fi, fd);
-        inserir(cliente(40, "cli40"), fmd, fi, fd);
-        inserir(cliente(10, "cli10"), fmd, fi, fd);
-        inserir(cliente(20, "cli20"), fmd, fi, fd);
-        inserir(cliente(11, "cli11"), fmd, fi, fd);
-        inserir(cliente(19, "cli19"), fmd, fi, fd);
-        inserir(cliente(18, "cli18"), fmd, fi, fd);
-        inserir(cliente(17, "cli17"), fmd, fi, fd);
-        inserir(cliente(50, "cli50"), fmd, fi, fd);
-        inserir(cliente(12, "cli12"), fmd, fi, fd);
-        inserir(cliente(60, "cli60"), fmd, fi, fd);
-        inserir(cliente(31, "cli31"), fmd, fi, fd);
-        inserir(cliente(32, "cli32"), fmd, fi, fd);
-        inserir(cliente(33, "cli33"), fmd, fi, fd);
-        inserir(cliente(61, "cli61"), fmd, fi, fd);
-        inserir(cliente(13, "cli13"), fmd, fi, fd);
-        inserir(cliente(14, "cli14"), fmd, fi, fd);
-        inserir(cliente(45, "cli45"), fmd, fi, fd);
-        inserir(cliente(61, "cli61"), fmd, fi, fd);
-        inserir(cliente(63, "cli63"), fmd, fi, fd);
-        inserir(cliente(64, "cli64"), fmd, fi, fd);
-        inserir(cliente(65, "cli65"), fmd, fi, fd);
-        inserir(cliente(100, "cli100"), fmd, fi, fd);
-        
+        int codigosCli[] = {
+            30, 40, 10, 20, 11, 19, 18, 17, 50, 12, 60, 31, 32, 33, 61, 13, 14, 45, 61, 63, 64, 65, 100
+        };
 
-        // a = busca(45, fmd, fi, fd);
-        // imprime_info(a);
-        // free(a);
+        int tam = sizeof(codigosCli)/sizeof(int);
+
+        for(int i=0; i<tam; i++){
+            inserir(cliente(codigosCli[i], "cliente"), fmd, fi, fd);
+        }
         
         ler_arquivo_de_dados(fd);
         ler_arquivo_de_indice(fi);

@@ -117,6 +117,9 @@ void libera_no_dados(NoDados* no_dados){
         free(no_dados->s[i]);
     }
 
+    // libera vetor
+    free(no_dados->s);
+
     // liberando espaço de memória do nó
     free(no_dados);
 }
