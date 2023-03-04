@@ -560,23 +560,24 @@ void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_fol
                 libera_no(novo_pai);
 
             } else {
+                // atualizacao do pai do filho esquerdo e direito
+                atualiza_pai_de_no(f_indice, n1_p_f_indice, no_pai->ppai);
+                atualiza_pai_de_no(f_indice, n2_p_f_indice, no_pai->ppai);
+                
+                // liberando nós
                 libera_no(no_pai);
                 libera_no(n1);
                 libera_no(n2);
                 //libera_no_auxiliar(no_auxiliar);
-
-                printf("here we are");
-                //propagar. Ainda não foi testado, nao sei se dá certo.
-                return inserir_em_arquivo_de_indice(no_auxiliar->s[2], n1->ppai, 0, n1_p_f_indice, n2_p_f_indice, f_metadados, f_indice, f_dados);
+                
+                //propagar
+                return inserir_em_arquivo_de_indice(no_auxiliar->s[2], no_pai->ppai, 0, n1_p_f_indice, n2_p_f_indice, f_metadados, f_indice, f_dados);
             }
-
-            
 
             libera_no(no_pai);
             libera_no(n1);
             libera_no(n2);
             //libera_no_auxiliar(no_auxiliar);
-            
         
         }
         
@@ -709,16 +710,13 @@ int main(void){
         inserir(cliente(63, "cli63"), fmd, fi, fd);
         inserir(cliente(64, "cli64"), fmd, fi, fd);
         inserir(cliente(65, "cli65"), fmd, fi, fd);
-
-        // aqui dá ruim
-        //inserir(cliente(100, "cli100"), fmd, fi, fd);
+        inserir(cliente(100, "cli100"), fmd, fi, fd);
+        
 
         // a = busca(45, fmd, fi, fd);
         // imprime_info(a);
         // free(a);
         
-       
-    
         ler_arquivo_de_dados(fd);
         ler_arquivo_de_indice(fi);
         ler_arquivo_de_metadados(fmd);
