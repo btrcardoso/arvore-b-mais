@@ -1,3 +1,4 @@
+// Estrutura que armazena a posição do nó raíz e uma flag que diz se a raíz é folha ou não
 typedef struct Metadados {
     int pont_raiz;           // ponteiro para a raiz da árvore
     int flag_raiz_folha;     // flag se a raíz é folha

@@ -1,7 +1,8 @@
+// Nós folha da Árvore B+. Cada nó comporta 4 Clientes.
 typedef struct NoDados{
     int m;                  // Número de chaves armazenadas no nó
     int ppai;               // Ponteiro no arquivo para o nó pai
-    int pprox;              // Ponteiro para a próxima página
+    int pprox;              // Ponteiro para a próxima página (Não foi utilizada)
     Cliente *s[4];          // Vetor de clientes s0, s1, s2, s3
 } NoDados;
 

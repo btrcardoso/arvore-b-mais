@@ -366,9 +366,6 @@ Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
 
 }
 
-
-/***************************************************** INSERIR  *****************************************************/
-
 // Atualiza o pai de um nó_dado no arquivo de dados
 void atualiza_pai_de_no_dado(FILE *f_dados, int p_f_dados, int ppai){
     NoDados *nd = buscar_no_dados(p_f_dados, f_dados);
@@ -390,6 +387,9 @@ void atualiza_pai_de_no(FILE *f_indice, int p_f_indice, int ppai){
     salva_no(no, f_indice);
     libera_no(no);
 }
+
+
+/***************************************************** INSERIR  *****************************************************/
 
 // Insere chave no arquivo de índice e dá um pai para os nós esquerdo e direito
 void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_folha, int p_filho_esq, int p_filho_dir, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
@@ -618,6 +618,24 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 }
 
 
+/******************************************************* TESTES *******************************************************/
+
+// testa a inserção de um conjunto de clientes na árvore B+
+void teste(FILE * fmd, FILE * fi, FILE * fd){
+
+    // Vetor de códigos a serem inseridos no cliente
+    int codigosCli[] = {
+        30, 40, 10, 20, 11, 19, 18, 17, 50, 12, 60, 31, 32, 33, 61, 13, 14, 45, 61, 63, 64, 65, 100
+    };
+    int tam = sizeof(codigosCli)/sizeof(int);
+
+    // Inserção de códigos de cliente na árvore b+
+    for(int i=0; i<tam; i++){
+        inserir(cliente(codigosCli[i], "cliente"), fmd, fi, fd);
+    }
+
+}
+
 /******************************************************** MAIN ********************************************************/
 
 int main(void){
@@ -632,16 +650,8 @@ int main(void){
     FILE *fi = abrir_arquivo_leitura_escrita("indice.dat", fi);
     FILE *fd = abrir_arquivo_leitura_escrita("dados.dat", fd);
     
-    // Vetor de códigos a serem inseridos no cliente
-    int codigosCli[] = {
-        30, 40, 10, 20, 11, 19, 18, 17, 50, 12, 60, 31, 32, 33, 61, 13, 14, 45, 61, 63, 64, 65, 100
-    };
-    int tam = sizeof(codigosCli)/sizeof(int);
-
-    // Inserção de códigos na árvore b+
-    for(int i=0; i<tam; i++){
-        inserir(cliente(codigosCli[i], "cliente"), fmd, fi, fd);
-    }
+    // funções de teste
+    teste(fmd, fi, fd);
     
     // Impressão do conteúdo dos arquivos
     ler_arquivo_de_dados(fd);
