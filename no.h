@@ -1,5 +1,4 @@
-// o nó aqui será lido como p0, (s0, p1), (s1, p2), (s2, p3), (s3, p4)
-
+// Nós internos da Árvore B+, com d=2. Cada nó comporta 4 chaves e 5 ponteiros para posições dos filhos nos arquivos.
 typedef struct No{
     int m;                  // Número de chaves armazenadas no nó
     int flag_aponta_folha;  // Flag booleano que diz se a página aponta para a folha
@@ -7,6 +6,7 @@ typedef struct No{
     int s[4];               // Vetor de chaves s0, s1, s2, s3
     int p[5];               // Vetor de ponteiros no arquivo para nós p0, p1, p2, p3, p4
 } No;
+// o nó aqui será lido como p0, (s0, p1), (s1, p2), (s2, p3), (s3, p4)
 
 // Imprime dados do nó
 void imprime_no(No *no);

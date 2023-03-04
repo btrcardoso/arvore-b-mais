@@ -24,6 +24,7 @@ void imprime_info(Info *info){
     printf("Encontramos? %d\n\n", info->encontrou);
 }
 
+
 /****************************************** FUNÇÕES PARA ABERTURA DE ARQUIVOS ******************************************/
 
 FILE * abrir_arquivo_escrita_novo(char *nome, FILE *f){
@@ -89,18 +90,9 @@ void criar_arquivo_de_dados(){
 }
 
 
-/***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE ÍNDICE *****************************************/
+/********************************** FUNÇÕES QUE LEEM E IMPRIMEM CONTEÚDO DOS ARQUIVOS **********************************/
 
-void inserir_no_arquivo_de_indice(FILE *out){
-    printf("\n-----------------------Inserindo informações no arquivo-----------------------\n");
-    No *pag;
-    for(int i=0; i<10; i++){
-        pag = no();
-        salva_no(pag, out);
-        free(pag);
-    }
-}
-
+// Lê e imprime conteúdo do arquivo de indice
 void ler_arquivo_de_indice(FILE *in){
     printf("\n-----------------------Lendo arquivo de indice-----------------------\n");
     
@@ -117,46 +109,7 @@ void ler_arquivo_de_indice(FILE *in){
 
 }
 
-void testar_arquivo_de_indice(){
-    FILE *findice = abrir_arquivo_leitura_escrita("indice.dat", findice);
-
-    inserir_no_arquivo_de_indice(findice);
-    ler_arquivo_de_indice(findice);
-
-    fclose(findice);
-    free(findice);
-}
-
-
-/***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE DADOS *****************************************/
-
-void inserir_no_arquivo_de_dados(FILE *out){
-    printf("\n-----------------------Inserindo informações no arquivo de dados-----------------------\n");
-    
-    NoDados *n;
-    for(int i=0; i<4; i++){
-        n = no_dados();
-        n = inserir_cliente_em_no_dado(n, cliente(0*i, "ana"));
-        n = inserir_cliente_em_no_dado(n, cliente(2*i, "carlos"));
-        n = inserir_cliente_em_no_dado(n, cliente(1*i, "bia"));
-        n = inserir_cliente_em_no_dado(n, cliente(3*i, "daniel"));
-        
-        salva_no_dados(n, out);
-        libera_no_dados(n);
-    } 
-}
-
-void atualizar_arquivo_de_dados(FILE *in){
-    printf("\n-----------------------Atualizando arquivo de dados-----------------------\n");
-    
-    rewind(in);
-    int pos = 0;
-    fseek(in, tamanho_no_dados() * pos, SEEK_SET);
-    NoDados *nd = no_dados();
-    salva_no_dados(nd, in);
-    libera_no_dados(nd);
-}
-
+// Lê e imprime conteúdo do arquivo de dados
 void ler_arquivo_de_dados(FILE *in){
     printf("\n-----------------------Lendo arquivo de dados-----------------------\n");
     
@@ -172,19 +125,7 @@ void ler_arquivo_de_dados(FILE *in){
 
 }
 
-void testar_arquivo_de_dados(){
-    FILE *fdados = abrir_arquivo_leitura_escrita("dados.dat", fdados);
-
-    inserir_no_arquivo_de_dados(fdados);
-    atualizar_arquivo_de_dados(fdados);
-    ler_arquivo_de_dados(fdados);
-
-    fclose(fdados);
-    free(fdados);
-}
-
-/***************************************** FUNÇÕES DE TESTE DO ARQUIVO DE METADADOS *****************************************/
-
+// Lê e imprime conteúdo do arquivo de metadados
 void ler_arquivo_de_metadados(FILE *in){
     printf("\n-----------------------Lendo arquivo de metadados-----------------------\n");
     
@@ -193,9 +134,10 @@ void ler_arquivo_de_metadados(FILE *in){
     free(md);
 }
 
-/******************************************************* BUSCAR *******************************************************/
 
-// retorna posicao do nó no arquivo de indice ou onde deveria estar
+/******************************************************* BUSCA *******************************************************/
+
+// retorna posicao do nó no arquivos (ou onde deveria estar)
 Info * busca(int x, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     // Inicializando informações
@@ -320,7 +262,8 @@ void imprime_resultado_busca(int x, FILE *fmd, FILE *fi, FILE *fd){
     free(a);
 }
 
-/************************************************* FUNÇÕES AUXILIARES *************************************************/
+
+/******************************************* FUNÇÕES AUXILIARES DA INSERÇÃO *******************************************/
 
 // Estrutura similar ao Nó, mas possui uma chave e ponteiro a mais.
 typedef struct NoAuxiliar{
@@ -423,8 +366,6 @@ Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
 
 }
 
-/***************************************************** INSERIR  *****************************************************/
-
 // Atualiza o pai de um nó_dado no arquivo de dados
 void atualiza_pai_de_no_dado(FILE *f_dados, int p_f_dados, int ppai){
     NoDados *nd = buscar_no_dados(p_f_dados, f_dados);
@@ -447,7 +388,10 @@ void atualiza_pai_de_no(FILE *f_indice, int p_f_indice, int ppai){
     libera_no(no);
 }
 
-// Recebe uma chave e dois nós filhos. A chave é inserida no arquivo de indice e as folhas ganham um pai
+
+/***************************************************** INSERIR  *****************************************************/
+
+// Insere chave no arquivo de índice e dá um pai para os nós esquerdo e direito
 void inserir_em_arquivo_de_indice(int chave, int p_f_indice, int flag_aponta_folha, int p_filho_esq, int p_filho_dir, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
 
     if(p_f_indice == -1){ // nós filhos são folhas e não tem pai
@@ -673,40 +617,53 @@ void inserir(Cliente *cli, FILE *f_metadados, FILE *f_indice, FILE *f_dados){
     free(md);
 }
 
+
+/******************************************************* TESTES *******************************************************/
+
+// testa a inserção de um conjunto de clientes na árvore B+
+void teste(FILE * fmd, FILE * fi, FILE * fd){
+
+    // Vetor de códigos a serem inseridos no cliente
+    int codigosCli[] = {
+        30, 40, 10, 20, 11, 19, 18, 17, 50, 12, 60, 31, 32, 33, 61, 13, 14, 45, 61, 63, 64, 65, 100
+    };
+    int tam = sizeof(codigosCli)/sizeof(int);
+
+    // Inserção de códigos de cliente na árvore b+
+    for(int i=0; i<tam; i++){
+        inserir(cliente(codigosCli[i], "cliente"), fmd, fi, fd);
+    }
+
+}
+
 /******************************************************** MAIN ********************************************************/
 
 int main(void){
 
+    // criação dos arquivos
     criar_arquivo_de_metadados();   
     criar_arquivo_de_indice();
     criar_arquivo_de_dados();
 
+    // abertura dos arquivos
     FILE *fmd = abrir_arquivo_leitura_escrita("metadados.dat", fmd);
     FILE *fi = abrir_arquivo_leitura_escrita("indice.dat", fi);
     FILE *fd = abrir_arquivo_leitura_escrita("dados.dat", fd);
     
-    {
-        int codigosCli[] = {
-            30, 40, 10, 20, 11, 19, 18, 17, 50, 12, 60, 31, 32, 33, 61, 13, 14, 45, 61, 63, 64, 65, 100
-        };
-
-        int tam = sizeof(codigosCli)/sizeof(int);
-
-        for(int i=0; i<tam; i++){
-            inserir(cliente(codigosCli[i], "cliente"), fmd, fi, fd);
-        }
-        
-        ler_arquivo_de_dados(fd);
-        ler_arquivo_de_indice(fi);
-        ler_arquivo_de_metadados(fmd);
-
-    }
+    // funções de teste
+    teste(fmd, fi, fd);
     
-
+    // Impressão do conteúdo dos arquivos
+    ler_arquivo_de_dados(fd);
+    ler_arquivo_de_indice(fi);
+    ler_arquivo_de_metadados(fmd);
+    
+    // Fechamento dos arquivos
     fclose(fmd);
     fclose(fi);
     fclose(fd);
     
+    // Liberando memória
     free(fmd);
     free(fi);
     free(fd);
