@@ -412,16 +412,7 @@ Cliente ** vetor_clientes_ordenado(Cliente **s, Cliente *novo_cli){
 
 }
 
-/** INSERIR  **/
-
-/*
-funcao de inserir no arquivo de indice precisa:
-
-    posicao do nó W no arquivo de ínidice 
-    flag_aponta_folha
-    posicao filho esqquerdo no arquivo (P)
-    posicao filho direito no arquivo (Q)
-*/
+/***************************************************** INSERIR  *****************************************************/
 
 // Atualiza o pai de um nó_dado no arquivo de dados
 void atualiza_pai_de_no_dado(FILE *f_dados, int p_f_dados, int ppai){
