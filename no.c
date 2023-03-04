@@ -111,8 +111,14 @@ int tamanho_no(){
 
 // libera o nó
 void libera_no(No *no){
-    // implementar
+     // liberando espaços de memória ocupados pelos registros de cliente
+    free(no->s);
+    free(no->p);
+
+    // liberando espaço de memória do nó
+    free(no);
 }
+
 
 // Insere chave em nó
 No * inserir_chave_em_no(No* no, int chave, int p_esq, int p_dir){
